@@ -9,13 +9,22 @@ const inputs = document.querySelector("#inpt");
 let userMessage = null; // Variable to store user's message
 const inputInitHeight = chatInput.scrollHeight;
 
-const createChatLi = (message, className) => {
+const createChatLi = (message, className, flag) => {
     // Create a chat <li> element with passed message and className
+    let chatContent = " ";
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
-    let chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
-    edit
-    </span>` : `<p id='vmcmd'></p><div id="btnDiv" class="btnDiv"><button class="btn btn-primary" style="width=5rem" onclick="editCommand()">Edit</button><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button></div>`;
+    if (flag == 1) {
+        chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
+        edit
+        </span>` : `<p></p>`;
+    }
+    else {
+        chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
+        edit
+        </span>` : `<p id='vmcmd'></p><div id="btnDiv" class="btnDiv"><button class="btn btn-primary" style="width=5rem" onclick="editCommand()">Edit</button><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button></div>`;
+    }
+
     chatLi.innerHTML = chatContent;
     chatLi.querySelector("p").textContent = message;
     return chatLi; // return chat <li> element
@@ -23,7 +32,7 @@ const createChatLi = (message, className) => {
 
 const generateResponse = (chatElement) => {
     const messageElement = chatElement.querySelector("p");
-    messageElement.textContent = "I'm interesetd in purchasing the laptop ";
+    messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-8 ";
 }
 
 const handleChat = () => {
@@ -49,22 +58,6 @@ const handleChat = () => {
 
 const editCommand = () => {
     document.getElementById('vmcmd').setAttribute('contenteditable', 'true');
-    /*sendBtnDiv = document.getElementById("btnDiv");
-    sendBtnDiv.innerHTML = " ";
-    saveBtn = document.createElement('button');
-    saveBtn.id = "saveBtn";
-    saveBtn.classList.add("btn");
-    saveBtn.classList.add("btn-success");
-    saveBtn.textContent = "Save";
-    saveBtn.onclick = function() {editMessage()};
-    cancelBtn = document.createElement('button');
-    cancelBtn.id = "saveBtn";
-    cancelBtn.classList.add("btn");
-    cancelBtn.classList.add("btn-secondary");
-    cancelBtn.textContent = "Cancel";
-    cancelBtn.onclick = function() {editMessage()};
-    sendBtnDiv.appendChild(saveBtn);
-    sendBtnDiv.appendChild(cancelBtn);*/
 }
 chatInput.addEventListener("input", () => {
     // Adjust the height of the input textarea based on its content
@@ -96,8 +89,33 @@ const clearAll = () => {
 const saveFile = () => {
 
     const inputFiles = document.getElementById("myFile");
-    const endpoint = "http://127.0.0.1:5000/"
+    const endpoint = "http://127.0.0.1:5000/upload"
     const formData = new FormData();
+    formData.append('file', inputFiles.files[0]);
 
-    formData.append('inputFiles', inputFiles.files[0])
+    fetch(endpoint, {
+        method: 'POST',
+        body: formData,
+    })
+        .then(response => response.json())
+        .then(data => checkResp(data))
+        .catch(error => console.error('Error:', error))
+    document.querySelector('.btn-close').click();
+    //function for execute CLI cmd
+    // execute();
+}
+const checkResp = (data) => {
+    cliCmd = document.getElementById('vmcmd').textContent;
+    console.log(data);
+    if ('error' in data) {
+        alert("Please upload your credentials file, It's required!")
+    }
+    else {
+        btnDiv = document.getElementById('btnDiv')
+        btnDiv.remove();
+        cliCmd = document.getElementById('vmcmd').textContent;
+        console.log(cliCmd)
+        chatbox.appendChild(createChatLi("Server response of executing CLI command", "incoming", 1));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+    }
 }

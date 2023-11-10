@@ -34,9 +34,9 @@ body {
 }
 
 .chat {
-  margin-top: auto;
+  margin-top: 10px;
   margin-bottom: auto;
-  width: 80%;
+  width: 90%;
 }
 
 .chatbot {
@@ -113,6 +113,7 @@ body {
 .chatbox .incoming p {
   color: #000;
   background: #f2f2f2;
+  width: fit-content;
 }
 
 .chatbot .chat-input {
@@ -235,4 +236,16 @@ input[type=file]::file-selector-button {
 
 input[type=file]::file-selector-button:hover {
   background: #0d45a5;
+}
+
+.recmnd-container {
+  display: flex;
+  gap: 5px;
+  position: absolute;
+  bottom: 3.2rem;
+  left: 1.5rem;
+  width: 90%;
+  border-radius: 30px;
+  background: #fff;
+  padding: 3px 20px;
 }

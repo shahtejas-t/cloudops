@@ -1,4 +1,3 @@
-{% block content %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,12 +32,14 @@
                     <div class="chatbot">
                         <ul class="chatbox">
                             <li class="chat incoming">
+
                             </li>
                         </ul>
                         <div class="chat-input">
                             <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
                             <span id="send-btn" class="material-symbols-rounded">send</span>
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -49,26 +50,25 @@
     <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content" style="background-color: #A0E7E5;border-radius: 1.3rem;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Credentials needed..</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                         onclick="clearAll()"></button>
                 </div>
                 <div class="modal-body">
-                    <h6>Enter your credentials</h6>
-                    <textarea placeholder="Enter your json ..." spellcheck="false" required id="userInput"></textarea>
-                    <hr>
+                    <!--<h6>Enter your credentials</h6>
+            <textarea placeholder="Enter your json ..." spellcheck="false" required id="userInput"></textarea> 
+            <hr>-->
                     <div>
                         <h6 style="margin-bottom: 1rem;">Upload your file here</h6>
-                        <input type="file" id="myFile" name="myFile" style="padding-left: 11px;
-               ">
+                        <input type="file" id="myFile" name="myFile" style="padding-left: 11px;">
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                         onclick="clearAll()">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="saveFile()">Save</button>
+                    <button type="button" class="btn btn-primary" onclick="saveFile()">Done</button>
                 </div>
             </div>
         </div>
@@ -79,4 +79,3 @@
     crossorigin="anonymous"></script>
 
 </html>
-{% endblock %}

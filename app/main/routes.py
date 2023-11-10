@@ -1,6 +1,7 @@
 from app.main import blueprint
-from flask import render_template, request, redirect
+from flask import render_template, request, redirect, jsonify
 from config import Config
+from werkzeug.utils import secure_filename
 from app.utils.watsonHelper import WatsonHelper
 
 @blueprint.route('/')
@@ -25,3 +26,13 @@ def user_Interaction():
 @blueprint.route('/wat/')
 def test_page():
     return '<br> URL : ' + Config.WATSONX_URL + '<br> API KEY : ' + Config.WATSONX_API_KEY + '<br> PROJECT_ID : ' + Config.WATSONX_PROJECT_ID + '<br> TOKEN : ' + WatsonHelper().get_token()
+
+@blueprint.route('/upload', methods = ['POST'])
+def upload_file():
+        if 'file' not in request.files:
+             return jsonify({'error':'No file part'})
+        file = request.files['file']
+        if file.filename == '':
+             return jsonify({'error':'We cannot able to process, please upload file.'})
+        file.save('utils/uploads/' + secure_filename(file.filename))
+        return jsonify({'message':'File uploaded successfully'})
