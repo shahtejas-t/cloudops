@@ -5,7 +5,7 @@ const chatInput = document.querySelector(".chat-input textarea");
 const sendChatBtn = document.querySelector(".chat-input span");
 const sendBtn = document.getElementById("sendBtn");
 const inputs = document.querySelector("#inpt");
-
+const spinDiv = document.getElementById('spinner');
 let userMessage = null; // Variable to store user's message
 const inputInitHeight = chatInput.scrollHeight;
 
@@ -35,7 +35,7 @@ const generateResponse = (chatElement) => {
     messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-8 ";
 }
 
-const handleChat = () => {
+const handleChat = (event) => {
     userMessage = chatInput.value.trim(); // Get user entered message and remove extra whitespace
     if(!userMessage) return;
 
@@ -46,18 +46,23 @@ const handleChat = () => {
     // Append the user's message to the chatbox
     chatbox.appendChild(createChatLi(userMessage, "outgoing"));
     chatbox.scrollTo(0, chatbox.scrollHeight);
-    
+    sendChatBtn.style.pointerEvents = 'none'; 
+    spinDiv.style.display = 'block';
+    chatbox.appendChild(spinDiv);
     setTimeout(() => {
         // Display "Thinking..." message while waiting for the response
-        const incomingChatLi = createChatLi("Thinking...", "incoming");
+        const incomingChatLi = createChatLi("Processing...", "incoming");
         chatbox.appendChild(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi);
-    }, 600);
+        sendChatBtn.style.pointerEvents = 'auto';
+        chatbox.removeChild(spinDiv);
+    }, 6000);
 }
 
 const editCommand = () => {
     document.getElementById('vmcmd').setAttribute('contenteditable','true');
+    document.getElementById('vmcmd').style.backgroundColor='antiquewhite';
 }
 chatInput.addEventListener("input", () => {
     // Adjust the height of the input textarea based on its content
@@ -87,26 +92,30 @@ const clearAll = ()=>{
 }
 
 const saveFile = () =>{
-    
+    let fileName = "";
     const inputFiles = document.getElementById("myFile");
     const endpoint = "http://127.0.0.1:5000/upload"
     const formData = new FormData();
     formData.append('file',inputFiles.files[0]);
-
+    if(inputFiles.files.length > 0){
+        fileName = inputFiles.files[0].name;
+    }
     fetch(endpoint,{
         method:'POST',
         body: formData,
     })
     .then(response => response.json())
-    .then(data => checkResp(data))
+    .then(data => checkResp(data,fileName))
     .catch(error => console.error('Error:',error))
     document.querySelector('.btn-close').click();
     //function for execute CLI cmd
    // execute();
 }
-const checkResp = (data) =>{
+const checkResp = (data, file) =>{
     cliCmd = document.getElementById('vmcmd').textContent;
+    let path = `utils/${file}`;
     console.log(data);
+    console.log(path)
     if ('error' in data){
         alert("Please upload your credentials file, It's required!")
     }
@@ -114,9 +123,26 @@ const checkResp = (data) =>{
         btnDiv = document.getElementById('btnDiv')
         btnDiv.remove();
         cliCmd = document.getElementById('vmcmd').textContent;
+        const endpoint = "http://127.0.0.1:5000/executeCommands"
         console.log(cliCmd)
-        chatbox.appendChild(createChatLi("Server response of executing CLI command","incoming",1));
+        fetch(endpoint, {
+            method:"post",
+            headers:{
+                "Content-Type": "application/json",
+            },
+            body : JSON.stringify({
+                path : path,
+                command : cliCmd
+            })
+        })
+        .then(response => response.json())
+        .then(data => cmdResp(data.msg))
+        .catch(error => console.error(error))
+
+        const cmdResp = (msg)=>{
+        chatbox.appendChild(createChatLi(msg,"incoming",1));
         chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
     }
 }
  

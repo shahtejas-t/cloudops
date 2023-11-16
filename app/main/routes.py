@@ -1,9 +1,12 @@
 from app.main import blueprint
-from flask import render_template, request, redirect, jsonify, url_for
+from flask import render_template, request, redirect, jsonify, url_for, current_app, Response
 from config import Config
 from werkzeug.utils import secure_filename
+import os
 from app.utils.watsonHelper import WatsonHelper
 
+
+#current_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @blueprint.route('/')
 @blueprint.route('/login', methods=['GET', 'POST'])
 def index():
@@ -29,10 +32,22 @@ def test_page():
 
 @blueprint.route('/upload', methods = ['POST'])
 def upload_file():
+        basedir = os.path.abspath(os.path.dirname(__file__))
         if 'file' not in request.files:
              return jsonify({'error':'No file part'})
         file = request.files['file']
         if file.filename == '':
              return jsonify({'error':'We cannot able to process, please upload file.'})
-        file.save('utils/uploads/' + secure_filename(file.filename))
+        file.save(os.path.join(basedir,current_app.config['UPLOAD_FOLDER'], secure_filename(file.filename)))
         return jsonify({'message':'File uploaded successfully'})
+
+@blueprint.route('/executeCommands', methods=['GET', 'POST'])
+def execute_commands():
+    data = request.json
+    command = data["command"]
+    KEY_FILE = data["path"]
+    print(command,KEY_FILE)
+    #result = executeCommands(command, KEY_FILE)
+    #response = Response("Command executed successfully.")
+    #response.headers['Content-Type'] = 'application/json; charset=utf-8'
+    return jsonify(msg = 'Command executed successfully')

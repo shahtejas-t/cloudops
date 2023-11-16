@@ -45,7 +45,7 @@ body {
 
 .chatbot .chatbox {
   overflow-y: auto;
-  height: 510px;
+  height: 410px;
   padding: 30px 20px 100px;
 }
 
@@ -115,15 +115,16 @@ body {
 }
 
 .chatbot .chat-input {
-  display: flex;
-  gap: 5px;
-  position: absolute;
-  bottom: 1.2rem;
-  left: 1.5rem;
-  width: 90%;
-  border-radius: 15px;
-  background: #fff;
-  padding: 3px 20px;
+    display: flex;
+    /* margin-top: 3rem; */
+    gap: 5px;
+    position: absolute;
+    bottom: 0.2rem;
+    left: 2.5rem;
+    width: 90%;
+    border-radius: 15px;
+    background: #fff;
+    padding: 3px 20px;
 }
 
 .chat-input textarea {
@@ -178,7 +179,7 @@ body {
 @media (min-width: 1200px) {
   .col-xl-6 {
     flex: 0 0 auto;
-    width: 70% !important;
+    width: 90% !important;
   }
 }
 
