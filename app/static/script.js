@@ -8,6 +8,7 @@ const inputs = document.querySelector("#inpt");
 
 let userMessage = null; // Variable to store user's message
 const inputInitHeight = chatInput.scrollHeight;
+executeMessage = null;
 
 const createChatLi = (message, className,flag) => {
     // Create a chat <li> element with passed message and className
@@ -20,9 +21,24 @@ const createChatLi = (message, className,flag) => {
         </span>` : `<p></p>`;
     }
     else{
-        chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
-        edit
-        </span>` : `<p id='vmcmd'></p><div id="btnDiv" class="btnDiv"><button class="btn btn-primary" style="width=5rem" onclick="editCommand()">Edit</button><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button></div>`;
+
+        // Generate a unique ID based on logic
+        const uniqueId = `vmcmd_${new Date().getTime()}`;
+
+        chatContent = className === "outgoing"
+        ? `<p data-id="${uniqueId}"></p><span class="material-symbols-outlined edit" data-edit-id="${uniqueId}">
+          edit
+          </span>`
+        : `<p data-id='${uniqueId}'></p><div data-btn-id="${uniqueId}" class="btnDiv">
+          <button class="btn btn-primary" style="width=5rem" onclick="editCommand('${uniqueId}')">Edit</button>
+          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button>
+          </div>`;
+
+        // chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
+        // edit
+        // </span>` : `<p id='vmcmd'></p><div id="btnDiv" class="btnDiv"><button class="btn btn-primary" style="width=5rem" onclick="editCommand()">Edit</button><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button></div>`;
+        executeMessage = message;
+        console.log(executeMessage);
     } 
     
     chatLi.innerHTML = chatContent;
@@ -32,33 +48,124 @@ const createChatLi = (message, className,flag) => {
 
 const generateResponse = (chatElement) => {
     const messageElement = chatElement.querySelector("p");    
-    messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-8 ";
+    messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-10 ";
+}
+
+const executeCommand = (filename, executeMessage) => {
+    const requestData = {
+        filename: filename,
+        executeMessage: executeMessage
+    };
+
+    fetch("/executecommands", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+    })
+    .then(response => response.json())
+    .then(data => handleExecuteCommandResponse(data))
+    .catch(error => console.error('Error:', error));
+}
+
+function downloadJSON(data, fileName) {
+    // Convert JSON to a string
+    const jsonString = JSON.stringify(data, null, 2);
+
+    // Create a Blob from the JSON string
+    const blob = new Blob([jsonString], { type: 'application/json' });
+
+    // Create a download link
+    const downloadLink = document.createElement('a');
+    downloadLink.href = URL.createObjectURL(blob);
+    downloadLink.download = fileName || 'data.json';
+    downloadLink.textContent = 'Download JSON'; // Added text content for the link
+
+    // Append the link to the body
+    document.body.appendChild(downloadLink);
+
+    return downloadLink; // Return the created link
+}
+
+
+// You can add a function to handle the response if needed
+const handleExecuteCommandResponse = (data) => {
+    console.log("Response from executeCommands:", data);
+    if(data.status === 200) {
+        chatbox.appendChild(createChatLi("Executed Successfully","incoming",1));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+    } 
+    else {
+        chatbox.appendChild(createChatLi("Error in execution","incoming",1));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+    }
+    // Download JSON file
+    const downloadLink = downloadJSON(data, 'example.json');
+
+    // Trigger the click event to start the download
+    downloadLink.click();
+
+    // Remove the link from the DOM
+    document.body.removeChild(downloadLink);
 }
 
 const handleChat = () => {
+
+
+    const form = document.getElementById('myForm');
+    // const chatMessage = document.getElementById('chat_message').value;
+
     userMessage = chatInput.value.trim(); // Get user entered message and remove extra whitespace
     if(!userMessage) return;
 
-    // Clear the input textarea and set its height to default
-    chatInput.value = "";
-    chatInput.style.height = `${inputInitHeight}px`;
+    const formData = new FormData();
+    formData.append('chat_message', userMessage);
 
-    // Append the user's message to the chatbox
-    chatbox.appendChild(createChatLi(userMessage, "outgoing"));
-    chatbox.scrollTo(0, chatbox.scrollHeight);
+    fetch("/predict", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle the response data as needed
     
-    setTimeout(() => {
-        // Display "Thinking..." message while waiting for the response
-        const incomingChatLi = createChatLi("Thinking...", "incoming");
-        chatbox.appendChild(incomingChatLi);
+        // Clear the input textarea and set its height to default
+        chatInput.value = "";
+        chatInput.style.height = `${inputInitHeight}px`;
+    
+        // Append the user's message to the chatbox
+        chatbox.appendChild(createChatLi(userMessage, "outgoing"));
         chatbox.scrollTo(0, chatbox.scrollHeight);
-        generateResponse(incomingChatLi);
-    }, 600);
+        
+        setTimeout(() => {
+            // Display "Thinking..." message while waiting for the response
+            const incomingChatLi = createChatLi(data, "incoming");
+            chatbox.appendChild(incomingChatLi);
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+            // generateResponse(incomingChatLi);
+        }, 600);
+        console.log(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+
 }
 
-const editCommand = () => {
-    document.getElementById('vmcmd').setAttribute('contenteditable','true');
+const editCommand = (uniqueId) => {
+    const element = document.querySelector(`[data-id="${uniqueId}"]`);
+    if (element) {
+        element.setAttribute('contenteditable', 'true');
+
+        // Add an event listener for blur to capture the edited content
+        element.addEventListener('blur', () => {
+            executeMessage = element.textContent.trim();
+        });
+    }
 }
+
+
 chatInput.addEventListener("input", () => {
     // Adjust the height of the input textarea based on its content
     chatInput.style.height = `${inputInitHeight}px`;
@@ -101,11 +208,12 @@ const saveFile = () =>{
     .then(data => checkResp(data))
     .catch(error => console.error('Error:',error))
     document.querySelector('.btn-close').click();
-    //function for execute CLI cmd
-   // execute();
+
+    // function for execute CLI cmd
+    executeCommand(inputFiles.files[0].name, executeMessage);
 }
 const checkResp = (data) =>{
-    cliCmd = document.getElementById('vmcmd').textContent;
+    // cliCmd = document.getElementById('vmcmd').textContent;
     console.log(data);
     if ('error' in data){
         alert("Please upload your credentials file, It's required!")
@@ -113,8 +221,7 @@ const checkResp = (data) =>{
     else{
         btnDiv = document.getElementById('btnDiv')
         btnDiv.remove();
-        cliCmd = document.getElementById('vmcmd').textContent;
-        console.log(cliCmd)
+        // cliCmd = document.getElementById('vmcmd').textContent;
         chatbox.appendChild(createChatLi("Server response of executing CLI command","incoming",1));
         chatbox.scrollTo(0, chatbox.scrollHeight);
     }

@@ -4,7 +4,9 @@ from config import Config
 from werkzeug.utils import secure_filename
 from app.utils.watsonHelper import WatsonHelper
 from app.utils.scripts import executeCommands
+from pathlib import Path
 
+upload_folder = 'uploads/'
 
 @blueprint.route('/')
 @blueprint.route('/login', methods=['GET', 'POST'])
@@ -30,13 +32,16 @@ def user_Interaction():
 def test_page():
     return '<br> URL : ' + Config.WATSONX_URL + '<br> API KEY : ' + Config.WATSONX_API_KEY + '<br> PROJECT_ID : ' + Config.WATSONX_PROJECT_ID + '<br> TOKEN : ' + WatsonHelper().get_token()
 
-@blueprint.route('/executeCommands', methods=['GET', 'POST'])
+@blueprint.route('/executecommands', methods=['GET', 'POST'])
 def execute_commands():
     data = request.get_json()
-    command = data["Command"]
-    KEY_FILE = data["Key_File"]
+    command = data["executeMessage"]
+    KEY_FILE = upload_folder + data["filename"]
+    print(KEY_FILE)
     result = executeCommands(command, KEY_FILE)
+    print(str(result))
     return jsonify(result)
+
 
 @blueprint.route('/upload', methods = ['POST'])
 def upload_file():
@@ -44,6 +49,15 @@ def upload_file():
              return jsonify({'error':'No file part'})
         file = request.files['file']
         if file.filename == '':
-             return jsonify({'error':'We cannot able to process, please upload file.'})
-        file.save('utils/uploads/' + secure_filename(file.filename))
+             return jsonify({'error':'Cannot process the file, please upload file.'})
+        # Check if the directory exists, and create it if not
+        Path(upload_folder).mkdir(parents=True, exist_ok=True)
+        file.save(upload_folder + secure_filename(file.filename))
         return jsonify({'message':'File uploaded successfully'})
+
+@blueprint.route('/predict', methods=['GET', 'POST'])
+def get_prediction():
+    if request.method == 'POST' and 'chat_message' in request.form:
+        chat_message = request.form['chat_message']  
+        return jsonify(WatsonHelper().get_prediction(chat_message).get('results')[0].get('generated_text'))
+    return jsonify("Internal Server Error.")
