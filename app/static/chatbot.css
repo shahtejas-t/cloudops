@@ -45,7 +45,7 @@ body {
 
 .chatbot .chatbox {
   overflow-y: auto;
-  height: 510px;
+  height: 410px;
   padding: 30px 20px 100px;
 }
 
@@ -118,8 +118,8 @@ body {
   display: flex;
   gap: 5px;
   position: absolute;
-  bottom: 1.2rem;
-  left: 1.5rem;
+  bottom: 0.8rem;
+  left: 3.5rem;
   width: 90%;
   border-radius: 15px;
   background: #fff;
@@ -178,7 +178,7 @@ body {
 @media (min-width: 1200px) {
   .col-xl-6 {
     flex: 0 0 auto;
-    width: 70% !important;
+    width: 90% !important;
   }
 }
 
@@ -204,8 +204,7 @@ span.edit :hover{
 }
 .btnDiv{
   position: relative;
-  margin: auto;
-  width: 50%;
+  margin-left: 7rem;
 }
 .modal-body textarea{
   height: 55px;
@@ -235,9 +234,14 @@ input[type=file]::file-selector-button:hover {
 .chat_text {
     margin: 0;
     padding: 0;
+    width: 100%;
+    display: flex;
 }
 
 .chat_text textarea {
     box-sizing: border-box;
     width: 100%;
+}
+.finalIncoming {
+  flex-direction: row !important;
 }
