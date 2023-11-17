@@ -19,7 +19,7 @@ const createChatLi = (message, className,flag) => {
         chatLi.classList.add("finalIncoming");
         chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
         edit
-        </span>` : `<p></p><button class="btn btn-primary" style="width:8rem;margin-left:3rem" id="dwnldBtn">Download</button>`;
+        </span>` : `<p></p><button class="btn btn-primary" style="width:12rem;margin-left:3rem" id="dwnldBtn"></button>`;
     }
     else{
 
@@ -90,9 +90,9 @@ function downloadJSON(data, fileName) {
     downloadLink.textContent = 'Download JSON'; // Added text content for the link
 
     // Append the link to the body
-    document.body.appendChild(downloadLink);
+    document.getElementById('dwnldBtn').appendChild(downloadLink);
 
-    return downloadLink; // Return the created link
+    //return downloadLink; // Return the created link
 }
 
 
@@ -113,12 +113,10 @@ const handleExecuteCommandResponse = (data) => {
     }
     // Download JSON file
     const downloadLink = downloadJSON(data, 'example.json');
-
     // Trigger the click event to start the download
-    downloadLink.click();
-
+    //downloadLink.click();
     // Remove the link from the DOM
-    document.body.removeChild(downloadLink);
+    //document.body.removeChild(downloadLink);
 }
 
 const handleChat = () => {
@@ -189,9 +187,12 @@ chatInput.addEventListener("input", () => {
 chatInput.addEventListener("keydown", (e) => {
     // If Enter key is pressed without Shift key and the window 
     // width is greater than 800px, handle the chat
-    if(e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
-        e.preventDefault();
-        handleChat();
+    if(sendChatBtn.style.pointerEvents != 'none')
+    {
+        if(e.key === "Enter" && !e.shiftKey && window.innerWidth > 800) {
+            e.preventDefault();
+            handleChat();
+        }
     }
 });
 sendChatBtn.addEventListener("click", handleChat);
@@ -203,8 +204,6 @@ function editMessage(){
         document.getElementById('vmcmd').setAttribute('contenteditable','false');
 }
 const clearAll = (id)=>{
-    btnDv = document.getElementById(id);
-    btnDv.innerHTML = " ";
     document.getElementById("userInput").value = "";
     document.getElementById("myFile").value = '';
 }
@@ -235,11 +234,9 @@ const checkResp = (data) =>{
         alert("Please upload your credentials file, It's required!")
     }
     else{
-        btnDiv = document.getElementById('btnDiv')
+        btnDiv = document.querySelector('.btnDiv')
         btnDiv.remove();
         // cliCmd = document.getElementById('vmcmd').textContent;
-        chatbox.appendChild(createChatLi("Server response of executing CLI command","incoming",1));
-        chatbox.scrollTo(0, chatbox.scrollHeight);
     }
 }
  
