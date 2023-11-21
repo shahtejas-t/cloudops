@@ -1,5 +1,7 @@
 from config import Config
 import requests
+import json
+import os
 
 class WatsonHelper:
          # Singleton class
@@ -14,7 +16,18 @@ class WatsonHelper:
         self.scoring_url = "https://us-south.ml.cloud.ibm.com/ml/v4/deployments/8c6d6928-bb3f-404b-ae28-77fb005d5c87/predictions?version=2021-05-01"
         self.model_url = "https://us-south.ml.cloud.ibm.com/ml/v1-beta/generation/text?version=2023-05-29"
         self.token = ""
+        self.dataset_path = "cliDataset.json"
 
+    def read_commands_from_json(self, file_path):
+        try:
+            with open(file_path, 'r') as file:
+                commands_list = json.load(file)
+            return commands_list
+        except FileNotFoundError:
+            current_working_directory = os.getcwd()
+            print(f"Current Working Directory: {current_working_directory}")
+            print(f"File not found: {file_path}")
+        
     def get_token(self):
         print(self.api_key, "*******************")
         token_response = requests.post(self.token_url, data={
@@ -25,6 +38,15 @@ class WatsonHelper:
     def get_prediction(self, input):
         url = "https://us-south.ml.cloud.ibm.com/ml/v1-beta/generation/text?version=2023-05-29"
 
+        commands = self.read_commands_from_json(self.dataset_path)
+        datasetStr = ""
+        if commands:
+            print("Commands read successfully:")
+            datasetStr = "Create cli for resource creation"
+            for command in commands:
+                datasetStr = datasetStr + "\n\nInput:\n" + command['Input'] + "\n\nOutput:\n" + command['Output']
+            # print(datasetStr)
+
         headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -33,7 +55,7 @@ class WatsonHelper:
 
         data = {
             "model_id": "google/flan-ul2",
-            "input": "Create cli for resource creation\n\nInput:\ncreate a vm demovm with 10gb of memory and 2 cpu\n\nOutput:\ngcloud compute instances create demovm --custom-cpu=2 --custom-memory=10\n\nInput:\ncreate a virtual machine with name demovm with 10gb of memory and 2 cpu\n\nOutput:\ngcloud compute instances create demovm --custom-cpu=2 --custom-memory=10\n\nInput:\ncreate a virtual machine with name demovm with 10gb of memory \n\nOutput:\ngcloud compute instances create demovm --custom-cpu=2 --custom-memory=10\n\nInput:\nI want to create a vm with name demovm1 with 15gb of memory\n\nOutput:\ngcloud compute instances create demovm1 --custom-memory=15\n\nInput:\ndelete vm demovm1\n\nOutput:\ngcloud compute instances delete  demovm1\n\nInput:\nremove vm demovm\n\nOutput:\ngcloud compute instances delete demovm\n\nInput:\ncreate a volume BUCKET_NAME\n\nOutput:\ngcloud storage buckets create gs://BUCKET_NAME\n\nInput:\ncreate a storage BUCKET_NAME\n\nOutput:\ngcloud storage buckets create gs://BUCKET_NAME\n\nInput:\ndelete volume BUCKET_NAME\n\nOutput:\ngcloud storage rm --recursive gs://BUCKET_NAME/\n\nInput:\nremove volume BUCKET_NAME\n\nOutput:\ngcloud storage rm --recursive gs://BUCKET_NAME/\n\nInput:\nI want to delete volume test1_vol\n\nOutput:\ngcloud storage rm --recursive gs:// test1_vol/\n\nInput:\nI want to remove volume test1_vol\n\nOutput:\ngcloud storage rm --recursive gs:// test1_vol/\n\nInput:\n" + input + "\n\nOutput:\n",
+            "input": datasetStr + "\n\nInput:\n" + input + "\n\nOutput:\n",
             "parameters": {
                 "decoding_method": "greedy",
                 "max_new_tokens": 100,
