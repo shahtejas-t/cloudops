@@ -23,11 +23,10 @@ def listInstances(vmName, projectId):
 
 def executeCommands(commands, KEY_FILE):
     result = {"status": 200, "response": ""}
+     # load a key_file
+    data = json.load(open(KEY_FILE))
+    projectId = str(data['project_id'])
     try:
-        # load a key_file
-        data = json.load(open(KEY_FILE))
-        projectId = str(data['project_id'])
-
         # login
         login = loginWithServiceAccount(KEY_FILE)
         if login == False:
@@ -61,18 +60,18 @@ def executeCommands(commands, KEY_FILE):
                 execute_command = commands + " --format json --zone us-east1-c --project " + projectId
             commands_output_josn = json.loads(
                 subprocess.check_output(shlex.split(execute_command)))
-            print(commands_output_josn)
+            # print(commands_output_josn)
             result['response'] = commands_output_josn
             # return commands_output_josn
     except subprocess.CalledProcessError as e:
-        print(f"Command failed with return code {e.returncode}")
-        result['response'] = e.returncode
+        print(f"Command failed with return code {e}")
+        result['response'] = e.output
         result['status'] = 500
         # return result
 
     except Exception as e:
         print("Error", e)
-        result['response'] = e.returncode
+        result['response'] = {"error while executing gcloud command"}
         result['status'] = 500
         # return result
     finally:
@@ -111,7 +110,7 @@ def listallInstances(projectId):
 
 def loginWithServiceAccount(KEY_FILE):
     try:
-        projectID = json.load(open(KEY_FILE))
+        # projectID = json.load(open(KEY_FILE))
         gcloud_login__command = "gcloud auth login --cred-file={} --format json".format(
             KEY_FILE)
         gcloud_login_josn = json.loads(
@@ -119,7 +118,7 @@ def loginWithServiceAccount(KEY_FILE):
         # print(gcloud_login_josn)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"Command failed with return code {e.returncode}")
+        print(f"Command failed with return code {e.output}")
         return{ "status": 500,"error":"Not able to login"}
 
 
@@ -127,10 +126,12 @@ def loginWithServiceAccount(KEY_FILE):
 def logout(projectId):
     try:
         logout_command = "gcloud auth revoke --project "+projectId
-        logout = json.loads(subprocess.check_output(
-            shlex.split(logout_command)))
-        return {"msg":"Logout Successfully"}
+        logout = json.loads(subprocess.check_output(shlex.split(logout_command)))
+        print("---------------------Logout------------")
+        print(logout)
+        return "Logout Successfully"
     except Exception as e:
         # print(f"Command failed with return code {e.returncode}")
-        print("Error while logging out")
+        print("Service account tokens cannot be revoked, but they will expire automatically.")
+        print("Logged out")
         return{"status":500,"error":"Not able to logout"}
