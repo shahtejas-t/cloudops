@@ -51,7 +51,6 @@ const createChatLi = (message, className, flag) => {
     chatLi.querySelector("p").textContent = message;
     return chatLi; // return chat <li> element
 }
-
 const generateResponse = (chatElement) => {
     const messageElement = chatElement.querySelector("p");
     messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-10 ";
