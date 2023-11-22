@@ -3,8 +3,7 @@ from flask import render_template, request, redirect, jsonify, url_for
 from config import Config
 from werkzeug.utils import secure_filename
 from app.utils.watsonHelper import WatsonHelper
-from app.utils.scripts import executeCommands
-from pathlib import Path
+from app.utils.gcpCLI import executeCommands
 
 upload_folder = 'uploads/'
 
