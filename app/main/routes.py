@@ -4,6 +4,8 @@ from config import Config
 from werkzeug.utils import secure_filename
 from app.utils.watsonHelper import WatsonHelper
 from app.utils.gcpCLI import executeCommands
+from pathlib import Path
+
 
 upload_folder = 'uploads/'
 
