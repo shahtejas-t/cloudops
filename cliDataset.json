@@ -4,7 +4,48 @@
       "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
     },
     {
-      "Input": "create a virtual machine with name demovm with 10gb of memory and 2 cpu",
+      "Input": "create a vm demovm with 10gb of memory",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "create a vm demovm with 10gb of ram",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "create a virtual machine demovm with 10gb of ram",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "create a vm demovm with ram=10gb",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "create a vm demovm with memory=10gb",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "Can you show me the command for creating a VM",
+      "Output": "gcloud compute instances create vm"
+    },
+    {
+      "Input": "Create a VM named demo_vm_2 with 16GB of RAM and a custom CPU configuration.",
+      "Output": "gcloud compute instances create demo_vm_2 --custom-cpu=2 --custom-memory=16"
+    },
+    {
+      "Input": "What's the command to create a VM",
+      "Output": "gcloud compute instances create vm"
+    },
+    {
+      "Input": "Create a VM demovm1 on GCP with 10gb of memory and 2 cpu",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+
+    {
+      "Input": "How to create a vm demovm with 10gb of memory",
+      "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+      "Input": "create a vm demovm with 10gb of memory and 2 cpu",
       "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
     },
     {
@@ -13,10 +54,22 @@
     },
     {
       "Input": "I want to create a vm with name demovm1 with 15gb of memory",
-      "Output": "gcloud compute instances create demovm1 --custom-memory=15"
+      "Output": "gcloud compute instances create demovm1 --custom-cpu=2 --custom-memory=15"
+    },
+    {
+      "Input": "cli command to create a vm with name demovm1 with 15gb of memory",
+      "Output": "gcloud compute instances create demovm1 --custom-cpu=2 --custom-memory=15"
     },
     {
       "Input": "delete vm demovm1",
+      "Output": "gcloud compute instances delete  demovm1"
+    },
+    {
+      "Input": "delete virtual machine demovm1",
+      "Output": "gcloud compute instances delete  demovm1"
+    },
+    {
+      "Input": "how to delete vm demovm1",
       "Output": "gcloud compute instances delete  demovm1"
     },
     {
@@ -24,7 +77,43 @@
       "Output": "gcloud compute instances delete demovm"
     },
     {
+      "Input": "remove virtual machine demovm1",
+      "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+      "Input": "I want to remove virtual machine demovm1",
+      "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+      "Input": "cli command to remove virtual machine demovm1",
+      "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+      "Input": "cli command to remove vm demovm1",
+      "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+      "Input": "cli command to delete vm demovm1",
+      "Output": "gcloud compute instances delete demovm1"
+    },
+    {
       "Input": "create a volume BUCKET_NAME",
+      "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+      "Input": "create a storage BUCKET_NAME",
+      "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+      "Input": "create a volume BUCKET_NAME",
+      "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+      "Input": "create a volume with name BUCKET_NAME",
+      "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+      "Input": "create a storage with name BUCKET_NAME",
       "Output": "gcloud storage buckets create gs://BUCKET_NAME"
     },
     {
@@ -40,12 +129,24 @@
       "Output": "gcloud storage rm --recursive gs://BUCKET_NAME/"
     },
     {
-      "Input": "I want to delete volume test1_vol",
-      "Output": "gcloud storage rm --recursive gs:// test1_vol/"
+      "Input": "I want to delete volume test1vol",
+      "Output": "gcloud storage rm --recursive gs:// test1vol/"
     },
     {
-      "Input": "I want to remove volume test1_vol",
-      "Output": "gcloud storage rm --recursive gs:// test1_vol/"
+      "Input": "cli command to delete volume test1vol",
+      "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+      "Input": "cli command to delete storage test1vol",
+      "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+      "Input": "cli command to delete bucket test1vol",
+      "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+      "Input": "I want to remove volume test1vol",
+      "Output": "gcloud storage rm --recursive gs:// test1vol/"
     }
   ]
   
