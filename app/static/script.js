@@ -8,6 +8,7 @@ const inputs = document.querySelector("#inpt");
 let userMessage = null; // Variable to store user's message
 const inputInitHeight = chatInput.scrollHeight;
 executeMessage = null;
+let num = 0;
 const spinDiv = document.getElementById('spinner');
 
 const createChatLi = (message, className, flag) => {
@@ -19,7 +20,7 @@ const createChatLi = (message, className, flag) => {
         chatLi.classList.add("finalIncoming");
         chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
         edit
-        </span>` : `<p></p><button class="btn btn-primary" style="width:12rem;margin-left:3rem" id="dwnldBtn"></button>`;
+        </span>` : `<p></p><button class = "btn btn-primary" style="width:12rem;margin-left:3rem" id="${id}"></button>`;
     }
     else {
         // Generate a unique ID based on logic
@@ -41,9 +42,6 @@ const createChatLi = (message, className, flag) => {
           </span>`
                 : `<p data-id='${uniqueId}'></p><div id="${uniqueId}" class="btnDiv">`
         }
-        // chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
-        // edit
-        // </span>` : `<p id='vmcmd'></p><div id="btnDiv" class="btnDiv"><button class="btn btn-primary" style="width=5rem" onclick="editCommand()">Edit</button><button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clear()">Execute</button></div>`;
         executeMessage = message;
         console.log(executeMessage);
     }
@@ -51,11 +49,6 @@ const createChatLi = (message, className, flag) => {
     chatLi.querySelector("p").textContent = message;
     return chatLi; // return chat <li> element
 }
-const generateResponse = (chatElement) => {
-    const messageElement = chatElement.querySelector("p");
-    messageElement.textContent = "gcloud compute instances create demo-instance  --custom-cpu=8 --custom-memory=32GB --machine-type=e2-standard-10 ";
-}
-
 const executeCommand = (filename, executeMessage) => {
     const requestData = {
         filename: filename,
@@ -87,9 +80,8 @@ const executeCommand = (filename, executeMessage) => {
         .then(data => handleExecuteCommandResponse(data))
         .catch(error => console.error('Error:', error));
     //make empty the button div
-
 }
-function downloadJSON(data, fileName) {
+function downloadJSON(data, fileName, id) {
     // Convert JSON to a string
     const jsonString = JSON.stringify(data, null, 2);
     // Create a Blob from the JSON string
@@ -98,28 +90,30 @@ function downloadJSON(data, fileName) {
     const downloadLink = document.createElement('a');
     downloadLink.href = URL.createObjectURL(blob);
     downloadLink.download = fileName || 'data.json';
-    downloadLink.textContent = 'Download JSON'; // Added text content for the link
+    downloadLink.textContent = 'Download Report'; // Added text content for the link
     // Append the link to the body
-    document.getElementById('dwnldBtn').appendChild(downloadLink);
+    document.getElementById(id).appendChild(downloadLink);
 }
     //return downloadLink; // Return the created link
 // You can add a function to handle the response if needed
 const handleExecuteCommandResponse = (data) => {
+    num = num + 1;
+    id = 'DwnldBtn_'+ num;
     console.log("Response from executeCommands:", data);
     if (data.status === 200) {
-        chatbox.appendChild(createChatLi("Executed Successfully.. For your reference download json file from link.", "incoming", 1));
+        chatbox.appendChild(createChatLi("Executed Successfully.. For your reference download json file from link.", "incoming", 1,id));
         chatbox.scrollTo(0, chatbox.scrollHeight);
         sendChatBtn.style.pointerEvents = 'auto';
         chatbox.removeChild(spinDiv);
     }
     else {
-        chatbox.appendChild(createChatLi("Error in execution.. for know more about error,please download json file from link.", "incoming", 1));
+        chatbox.appendChild(createChatLi("Error in execution.. for know more about error,please download json file from link.", "incoming", 1,id));
         chatbox.scrollTo(0, chatbox.scrollHeight);
         sendChatBtn.style.pointerEvents = 'auto';
         chatbox.removeChild(spinDiv);
     }
     // Download JSON file
-    const downloadLink = downloadJSON(data, 'example.json');
+    const downloadLink = downloadJSON(data, 'example.json',id);
 }
 const handleChat = () => {
     const form = document.getElementById('myForm');
