@@ -8,7 +8,10 @@ const inputs = document.querySelector("#inpt");
 let userMessage = null; // Variable to store user's message
 const inputInitHeight = chatInput.scrollHeight;
 executeMessage = null;
+const modalBox = document.getElementById('exampleModal');
 let num = 0;
+let inputFile = "";
+let credFile = "";
 const spinDiv = document.getElementById('spinner');
 
 const createChatLi = (message, className, flag) => {
@@ -32,7 +35,7 @@ const createChatLi = (message, className, flag) => {
           </span>`
                 : `<p data-id='${uniqueId}'></p><div id="${uniqueId}" class="btnDiv">
           <button class="btn btn-primary" style="width=5rem" onclick="editCommand('${uniqueId}')">Edit</button>
-          <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" onclick="clearAll('${uniqueId}')">Execute</button>
+          <button class="btn btn-success" onclick="clearAll('${uniqueId}')">Execute</button>
           </div>`;
         }
         else {
@@ -80,6 +83,7 @@ const executeCommand = (filename, executeMessage) => {
         .then(data => handleExecuteCommandResponse(data))
         .catch(error => console.error('Error:', error));
     //make empty the button div
+    inputFile = " ";
 }
 function downloadJSON(data, fileName, id) {
     // Convert JSON to a string
@@ -195,11 +199,26 @@ chatInput.addEventListener("keydown", (e) => {
 });
 sendChatBtn.addEventListener("click", handleChat);
 const clearAll = (id) => {
-    document.getElementById("userInput").value = "";
-    document.getElementById("myFile").value = '';
+    const endpoint = "http://127.0.0.1:5000/checkFileExists"
+    fetch(endpoint, {
+        method : 'GET'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status == 200){
+            btnDiv = document.querySelector('.btnDiv')
+            btnDiv.remove();
+           executeCommand(data.fileName , executeMessage)
+        }
+        else{
+            modalBox.classList.add('show');
+            modalBox.style.display = 'block';
+        }
+    })
 }
 const saveFile = () => {
     const inputFiles = document.getElementById("myFile");
+    inputFile = inputFiles.files[0].name;
     const endpoint = "http://127.0.0.1:5000/upload"
     const formData = new FormData();
     formData.append('file', inputFiles.files[0]);
@@ -212,7 +231,7 @@ const saveFile = () => {
         .catch(error => console.error('Error:', error))
     document.querySelector('.btn-close').click();
     // function for execute CLI cmd
-    executeCommand(inputFiles.files[0].name, executeMessage);
+    
 }
 const checkResp = (data) => {
     if ('error' in data) {
@@ -221,5 +240,17 @@ const checkResp = (data) => {
     else {
         btnDiv = document.querySelector('.btnDiv')
         btnDiv.remove();
+        executeCommand(inputFile, executeMessage);
     }
+}
+
+const closeModal = () => {
+    modalBox.classList.remove('show');
+    modalBox.style.display = 'none';
+    document.getElementById("myFile").value = '';
+}
+const crossModal = () => {
+    modalBox.classList.remove('show');
+    modalBox.style.display = 'none';
+    document.getElementById("myFile").value = '';
 }
