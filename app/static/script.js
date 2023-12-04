@@ -57,6 +57,11 @@ const executeCommand = (filename, executeMessage) => {
         filename: filename,
         executeMessage: executeMessage
     };
+    let isListCmd = false;
+    listCmd = executeMessage.split(' ');
+    if (listCmd.length > 3 && listCmd[3] == 'list') {
+        isListCmd = true;
+    }
     //disable the multiple send click
     sendChatBtn.style.pointerEvents = 'none';
     //displaying the spinner whenever response is ready.
@@ -70,17 +75,17 @@ const executeCommand = (filename, executeMessage) => {
         body: JSON.stringify(requestData),
     })
         .then(response => {
-           if(response.status == 500){
-            setTimeout(() => {
-                chatbox.appendChild(createChatLi("OOPS! something went wrong, Upload correct auth file", "incoming"));
-                chatbox.scrollTo(0, chatbox.scrollHeight);
-                sendChatBtn.style.pointerEvents = 'auto';
-                chatbox.removeChild(spinDiv);
-            },3000);
+            if (response.status == 500) {
+                setTimeout(() => {
+                    chatbox.appendChild(createChatLi("OOPS! something went wrong, Upload correct auth file", "incoming"));
+                    chatbox.scrollTo(0, chatbox.scrollHeight);
+                    sendChatBtn.style.pointerEvents = 'auto';
+                    chatbox.removeChild(spinDiv);
+                }, 3000);
             }
             else return response.json();
-        })   
-        .then(data => handleExecuteCommandResponse(data))
+        })
+        .then(data => handleExecuteCommandResponse(data, isListCmd))
         .catch(error => console.error('Error:', error));
     //make empty the button div
     inputFile = " ";
@@ -98,26 +103,94 @@ function downloadJSON(data, fileName, id) {
     // Append the link to the body
     document.getElementById(id).appendChild(downloadLink);
 }
-    //return downloadLink; // Return the created link
+//return downloadLink; // Return the created link
 // You can add a function to handle the response if needed
-const handleExecuteCommandResponse = (data) => {
+const handleExecuteCommandResponse = (data, isListCmd) => {
     num = num + 1;
-    id = 'DwnldBtn_'+ num;
+    id = 'DwnldBtn_' + num;
     console.log("Response from executeCommands:", data);
-    if (data.status === 200) {
-        chatbox.appendChild(createChatLi("Executed Successfully.. For your reference download json file from link.", "incoming", 1,id));
+    if (data.status === 200 && typeof (data.response) === "string") {
+        chatbox.appendChild(createChatLi(data.response, "incoming", 1, id));
+        let chatLi = document.createElement('li');
+        chatLi.classList.add('chat', 'incoming');
+        resp = `<p>${data.response}</p>`;
         chatbox.scrollTo(0, chatbox.scrollHeight);
+        chatLi.innerHTML = vmListElement;
+        chatbox.appendChild(chatLi);
         sendChatBtn.style.pointerEvents = 'auto';
         chatbox.removeChild(spinDiv);
+    }
+    else if (data.status === 200 && data.response[0].hasOwnProperty('name')) {
+        let respo = data.response[0];
+        let vmList = "";
+        sendChatBtn.style.pointerEvents = 'auto';
+        chatbox.removeChild(spinDiv);
+        if (data.response.length > 1 || isListCmd) {
+            for (i = 0; i < data.response.length; i++) {
+                vmList += `<li style="list-style: auto;
+                margin-bottom: -2rem;margin-top:2rem">${data.response[i].name}</li>
+                <ul>
+                <li>Machine Type : ${data.response[i].machineType}</li>
+                <li>Disk Size : ${data.response[i].disks[0].diskSizeGb}gb</li>
+                <li>Zone : ${data.response[i].zone}</li></ul>`;
+
+            }
+            const chatLi = document.createElement('li');
+            chatLi.classList.add('chat', 'finalIncoming');
+            const vmListElement = `<h6><center>VM's list.</center></h6>
+            <ul style="margin-top: -1rem;margin-bottom: 1rem;list-style: disc !important;white-space: pre-line !important;">
+            ${vmList}
+            </ul><button class = "btn btn-primary" style="margin-top: -1rem;
+            margin-bottom: 1rem;
+            list-style: auto;width: 12rem;
+            margin-left: 15rem;" id="${id}"></button>`
+            chatLi.innerHTML = vmListElement;
+            chatbox.appendChild(chatLi);
+        }
+        else {
+            const chatLi = document.createElement('li');
+            chatLi.classList.add('chat', 'finalIncoming');
+            const respElement = `<p style='margin-left: -16px;'>VM is created successfully with below configurations.</p><h6>Configurations</h6>
+        <ul style="margin-top: -1rem;margin-bottom: 1rem;list-style: disc !important;white-space: pre-line !important;">
+        <li>Name : ${respo.name}</li>
+        <li>Machine Type : ${respo.machineType}</li>
+        <li>Disk Size : ${respo.disks[0].diskSizeGb}gb</li>
+        <li>Zone : ${respo.zone}</li>
+        </ul><button class = "btn btn-primary" style="margin-top: -1rem;
+        margin-bottom: 1rem;
+        list-style: auto;width: 12rem;
+        margin-left: 15rem;" id="${id}"></button>`
+            chatLi.innerHTML = respElement;
+            chatbox.appendChild(chatLi);
+        }
+        vmList = "";
     }
     else {
-        chatbox.appendChild(createChatLi("Error in execution.. for know more about error,please download json file from link.", "incoming", 1,id));
-        chatbox.scrollTo(0, chatbox.scrollHeight);
         sendChatBtn.style.pointerEvents = 'auto';
         chatbox.removeChild(spinDiv);
+        arr = data.response;
+        let li = ""
+        if (arr.length > 0) {
+            for (i = 0; i < arr.length; i++) {
+                li = `<li>${arr[i]}</li>`;
+            }
+        }
+        const chatLi = document.createElement('li');
+        chatLi.classList.add('chat', 'finalIncoming');
+        const respElement = `<p>VM is not avialable to delete, for your reference please see the list of availabe VM's</p><ul style="margin-top: -1rem;
+        margin-bottom: 1rem;
+        list-style: auto !important;">${li}</ul><button class = "btn btn-primary" style="margin-top: -1rem;
+        margin-bottom: 1rem;
+        list-style: auto;width: 12rem;
+        margin-left: 15rem;" id="${id}"></button>`
+        chatLi.innerHTML = respElement;
+        chatbox.appendChild(chatLi);
+        //chatbox.appendChild(createChatLi("VM is not avialable to delete, for your reference please see the list of availabe VM's", 1,id,arr));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+
     }
     // Download JSON file
-    const downloadLink = downloadJSON(data, 'example.json',id);
+    const downloadLink = downloadJSON(data, 'exam\ple.json', id);
 }
 const handleChat = () => {
     const form = document.getElementById('myForm');
@@ -140,18 +213,18 @@ const handleChat = () => {
         method: 'POST',
         body: formData
     })
-        .then(response =>{
-            if(response.status == 500){
+        .then(response => {
+            if (response.status == 500) {
                 setTimeout(() => {
                     const incomingChatLi = createChatLi("we are processing your request! please wait or check your internet connection.", "incoming");
                     chatbox.appendChild(incomingChatLi);
                     chatbox.scrollTo(0, chatbox.scrollHeight);
                     sendChatBtn.style.pointerEvents = 'auto';
                     chatbox.removeChild(spinDiv);
-            }, 3000);
-        }
-        else return response.json();
-    })     
+                }, 3000);
+            }
+            else return response.json();
+        })
         .then(data => {
             // Handle the response data as needed
             setTimeout(() => {
@@ -201,20 +274,20 @@ sendChatBtn.addEventListener("click", handleChat);
 const clearAll = (id) => {
     const endpoint = "http://127.0.0.1:5000/checkFileExists"
     fetch(endpoint, {
-        method : 'GET'
+        method: 'GET'
     })
-    .then(response => response.json())
-    .then(data => {
-        if(data.status == 200){
-            btnDiv = document.querySelector('.btnDiv')
-            btnDiv.remove();
-           executeCommand(data.fileName , executeMessage)
-        }
-        else{
-            modalBox.classList.add('show');
-            modalBox.style.display = 'block';
-        }
-    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status == 200) {
+                btnDiv = document.querySelector('.btnDiv')
+                setTimeout(() => { btnDiv.remove(); }, 1000)
+                executeCommand(data.fileName, executeMessage)
+            }
+            else {
+                modalBox.classList.add('show');
+                modalBox.style.display = 'block';
+            }
+        })
 }
 const saveFile = () => {
     const inputFiles = document.getElementById("myFile");
@@ -231,7 +304,7 @@ const saveFile = () => {
         .catch(error => console.error('Error:', error))
     document.querySelector('.btn-close').click();
     // function for execute CLI cmd
-    
+
 }
 const checkResp = (data) => {
     if ('error' in data) {

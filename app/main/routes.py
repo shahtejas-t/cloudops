@@ -65,7 +65,7 @@ def get_prediction():
 
 @blueprint.route('/checkFileExists', methods = ['GET'])
 def check_File():
-    fileName = Path(upload_folder + "\\genai-based-application-547a204c911c.json")
+    fileName = Path(upload_folder + "genai-based-application-547a204c911c.json")
     print(fileName)
     if fileName.exists() :
         return {"status":200 , "fileName" : "genai-based-application-547a204c911c.json"}

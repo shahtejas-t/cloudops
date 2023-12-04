@@ -1,5 +1,6 @@
 /* Import Google font - Poppins */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -104,13 +105,25 @@ body {
   color: #721c24;
   background: #f8d7da;
 }
-.incoming{
-   flex-direction: column;
+
+.incoming {
+  flex-direction: column;
 }
+
 .chatbox .incoming p {
   color: #000;
   background: #f2f2f2;
   width: fit-content;
+}
+
+.chatbot .finalIncoming p {
+  white-space: pre-wrap;
+  padding: 12px 16px;
+  max-width: none !important;
+  color: black;
+  background: none;
+  font-size: 0.95rem;
+
 }
 
 .chatbot .chat-input {
@@ -188,24 +201,27 @@ body {
   margin-top: 10px;
   cursor: pointer;
 }
-span.edit :hover{
+
+span.edit :hover {
   background: #724ae8;
 }
 
-.btn{
+.btn {
   height: fit-content !important;
-    padding: 0.5rem !important;
-    margin-top: 4px !important;
-    border-radius: 0.5rem !important;
-    border: 1px white !important;
-    margin: 6px;
-    width: 5rem;
+  padding: 0.5rem !important;
+  margin-top: 4px !important;
+  border-radius: 0.5rem !important;
+  border: 1px white !important;
+  margin: 6px;
+  width: 5rem;
 }
-.btnDiv{
+
+.btnDiv {
   position: relative;
   margin-left: 7rem;
 }
-.modal-body textarea{
+
+.modal-body textarea {
   height: 55px;
   width: 100%;
   border-radius: 21px;
@@ -215,6 +231,7 @@ span.edit :hover{
   padding: 15px 15px 15px 6px;
   font-size: 0.95rem;
 }
+
 input[type=file]::file-selector-button {
   margin-right: 20px;
   border: none;
@@ -231,22 +248,30 @@ input[type=file]::file-selector-button:hover {
 }
 
 .chat_text {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    display: flex;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
 }
 
 .chat_text textarea {
-    box-sizing: border-box;
-    width: 100%;
+  box-sizing: border-box;
+  width: 100%;
 }
+
 .finalIncoming {
-  flex-direction: row !important;
+  flex-direction: column !important;
+  background-color: #f2f2f2;
+  border-radius: 10px 10px 10px 0px !important;
+  white-space: pre-wrap;
+  padding: 12px 16px;
+  width: 70%;
 }
-a{
-  color:white !important;
+
+a {
+  color: white !important;
 }
-a:hover{
+
+a:hover {
   color: black;
 }
