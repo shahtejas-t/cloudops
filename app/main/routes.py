@@ -38,6 +38,7 @@ def execute_commands():
     data = request.get_json()
     command = data["executeMessage"]
     KEY_FILE = upload_folder + data["filename"]
+    #KEY_FILE =  data["filename"]
     print(KEY_FILE)
     result = executeCommands(command, KEY_FILE)
     print(str(result))
@@ -45,7 +46,7 @@ def execute_commands():
 
 
 @blueprint.route('/upload', methods = ['POST'])
-def upload_file():
+def upload_file(): 
         if 'file' not in request.files:
              return jsonify({'error':'No file part'})
         file = request.files['file']
@@ -62,3 +63,11 @@ def get_prediction():
         chat_message = request.form['chat_message']  
         return jsonify(WatsonHelper().get_prediction(chat_message).get('results')[0].get('generated_text'))
     return jsonify("Internal Server Error.")
+
+@blueprint.route('/checkFileExists', methods = ['GET'])
+def check_File():
+    fileName = Path(upload_folder + "genai-based-application-547a204c911c.json")
+    print(fileName)
+    if fileName.exists() :
+        return {"status":200 , "fileName" : "genai-based-application-547a204c911c.json"}
+    return {"status":201 , "message" : "File not exists"}

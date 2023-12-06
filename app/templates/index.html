@@ -56,8 +56,7 @@
             <div class="modal-content" style="border-radius: 1.3rem;">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Credentials needed..</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-                        onclick="clearAll()"></button>
+                    <button type="button" class="btn-close" onclick="crossModal()"></button>
                 </div>
                 <div class="modal-body"> 
                     <div>
@@ -67,7 +66,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-                        onclick="clearAll()">Close</button>
+                        onclick="closeModal()">Close</button>
                     <button type="button" class="btn btn-primary" onclick="saveFile()">Done</button>
                 </div>
             </div>
