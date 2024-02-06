@@ -39,7 +39,7 @@ def execute_commands():
     data = request.get_json()
     commands = data["executeMessage"]
     KEY_FILE = upload_folder + data["filename"]
-    KEY_FILE =  data["filename"]
+    # KEY_FILE =  data["filename"]
     result ={}
 
     print(KEY_FILE)
