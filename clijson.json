@@ -1,0 +1,302 @@
+[
+    {
+        "Input": "create a vm demovm with 10gb of memory and 2 cpu",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with 10gb of memory and 2 cpu",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with 10gb of memory",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with 10gb of ram",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a virtual machine demovm with 10gb of ram",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with ram=10gb",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with memory=10gb",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "Can you show me the command for creating a VM",
+        "Output": "gcloud compute instances create vm"
+    },
+    {
+        "Input": "Create a VM named demo_vm_2 with 16GB of RAM and a custom CPU configuration.",
+        "Output": "gcloud compute instances create demo_vm_2 --custom-cpu=2 --custom-memory=16"
+    },
+    {
+        "Input": "What's the command to create a VM",
+        "Output": "gcloud compute instances create vm"
+    },
+    {
+        "Input": "Create a VM demovm1 on GCP with 10gb of memory and 2 cpu",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "How to create a vm demovm with 10gb of memory",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a vm demovm with 10gb of memory and 2 cpu",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "create a virtual machine with name demovm with 10gb of memory",
+        "Output": "gcloud compute instances create demovm --custom-cpu=2 --custom-memory=10"
+    },
+    {
+        "Input": "I want to create a vm with name demovm1 with 15gb of memory",
+        "Output": "gcloud compute instances create demovm1 --custom-cpu=2 --custom-memory=15"
+    },
+    {
+        "Input": "cli command to create a vm with name demovm1 with 15gb of memory",
+        "Output": "gcloud compute instances create demovm1 --custom-cpu=2 --custom-memory=15"
+    },
+    {
+        "Input": "delete vm demovm1",
+        "Output": "gcloud compute instances delete  demovm1"
+    },
+    {
+        "Input": "delete virtual machine demovm1",
+        "Output": "gcloud compute instances delete  demovm1"
+    },
+    {
+        "Input": "how to delete vm demovm1",
+        "Output": "gcloud compute instances delete  demovm1"
+    },
+    {
+        "Input": "remove vm demovm",
+        "Output": "gcloud compute instances delete demovm"
+    },
+    {
+        "Input": "remove virtual machine demovm1",
+        "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+        "Input": "I want to remove virtual machine demovm1",
+        "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+        "Input": "cli command to remove virtual machine demovm1",
+        "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+        "Input": "cli command to remove vm demovm1",
+        "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+        "Input": "cli command to delete vm demovm1",
+        "Output": "gcloud compute instances delete demovm1"
+    },
+    {
+        "Input": "create a volume BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "create a storage BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "create a volume BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "create a volume with name BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "create a storage with name BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "create a storage BUCKET_NAME",
+        "Output": "gcloud storage buckets create gs://BUCKET_NAME"
+    },
+    {
+        "Input": "delete volume BUCKET_NAME",
+        "Output": "gcloud storage rm --recursive gs://BUCKET_NAME/"
+    },
+    {
+        "Input": "remove volume BUCKET_NAME",
+        "Output": "gcloud storage rm --recursive gs://BUCKET_NAME/"
+    },
+    {
+        "Input": "I want to delete volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete storage test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete bucket test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "I want to remove volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "create a disk demo",
+        "Output": "gcloud compute disks create demo"
+    },
+    {
+        "Input": "create a disks demo",
+        "Output": "gcloud compute disks create demo"
+    },
+    {
+        "Input": "create a compute disks demo",
+        "Output": "gcloud compute disks create demo"
+    },
+    {
+        "Input": "create a disk demodisk",
+        "Output": "gcloud compute disks create demodisk"
+    },
+    {
+        "Input": "create a disk demodisk with size 10gb",
+        "Output": "gcloud compute disks create demodisk --size=10"
+    },
+    {
+        "Input": "create a network demo",
+        "Output": "gcloud compute networks create demo"
+    },
+    {
+        "Input": "create a networks demo",
+        "Output": "gcloud compute networks create demo"
+    },
+    {
+        "Input": "create a compute network demo",
+        "Output": "gcloud compute networks create demo"
+    },
+    {
+        "Input": "create a network demonetwork",
+        "Output": "gcloud compute networks create demonetwork"
+    },
+    {
+        "Input": "create a disk demonetwork with size 10gb",
+        "Output": "gcloud compute networks create demonetwork --size=10"
+    },
+    {
+        "Input": "create a volume demo",
+        "Output": "gcloud storage buckets create gs://demo"
+    },
+    {
+        "Input": "create a volume demovol",
+        "Output": "gcloud storage buckets create gs://demovol"
+    },
+    {
+        "Input": "create a bucket demovol",
+        "Output": "gcloud storage buckets create gs://demovol"
+    },
+    {
+        "Input": "create a storage vol123",
+        "Output": "gcloud storage buckets create gs://vol123"
+    },
+    {
+        "Input": "create a volume vol123",
+        "Output": "gcloud storage buckets create gs://vol123"
+    },
+    {
+        "Input": "create a volume with name sto123",
+        "Output": "gcloud storage buckets create gs://sto123"
+    },
+    {
+        "Input": "create a volume with name volume123",
+        "Output": "gcloud storage buckets create gs://volume123"
+    },
+    {
+        "Input": "create a storage with name buc123",
+        "Output": "gcloud storage buckets create gs://buc123"
+    },
+    {
+        "Input": "create a delete demovol1",
+        "Output": "gcloud storage buckets create gs://demovol1"
+    },
+    {
+        "Input": "create a delete vol1",
+        "Output": "gcloud storage buckets create gs://vol1"
+    },
+    {
+        "Input": "create a delete vol2",
+        "Output": "gcloud storage buckets create gs://vol2"
+    },
+    {
+        "Input": "create a volume demo",
+        "Output": "gcloud storage rm --recursive gs://demo"
+    },
+    {
+        "Input": "delete a volume demovol",
+        "Output": "gcloud storage rm --recursive gs://demovol"
+    },
+    {
+        "Input": "delete a bucket demovol",
+        "Output": "gcloud storage rm --recursive gs://demovol"
+    },
+    {
+        "Input": "delete a storage vol123",
+        "Output": "gcloud storage rm --recursive gs://vol123"
+    },
+    {
+        "Input": "delete a volume vol123",
+        "Output": "gcloud storage rm --recursive gs://vol123"
+    },
+    {
+        "Input": "delete a volume with name sto123",
+        "Output": "gcloud storage rm --recursive gs://sto123"
+    },
+    {
+        "Input": "delete a volume with name volume123",
+        "Output": "gcloud storage rm --recursive gs://volume123"
+    },
+    {
+        "Input": "delete a storage with name buc123",
+        "Output": "gcloud storage rm --recursive gs://buc123"
+    },
+    {
+        "Input": "delete a delete demovol1",
+        "Output": "gcloud storage rm --recursive gs://demovol1"
+    },
+    {
+        "Input": "delete a delete vol1",
+        "Output": "gcloud storage rm --recursive gs: //vol1"
+    },
+    {
+        "Input": "delete a delete vol2",
+        "Output": "gcloud storage rm --recursive gs://vol2"
+    },
+    {
+        "Input": "I want to delete volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete storage test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "cli command to delete bucket test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    },
+    {
+        "Input": "I want to remove volume test1vol",
+        "Output": "gcloud storage rm --recursive gs:// test1vol/"
+    }
+]

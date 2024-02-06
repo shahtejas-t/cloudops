@@ -3,7 +3,8 @@ from flask import render_template, request, redirect, jsonify, url_for
 from config import Config
 from werkzeug.utils import secure_filename
 from app.utils.watsonHelper import WatsonHelper
-from app.utils.gcpCLI import executeCommands
+from app.utils.gcpCLI import executeGcpCommands
+from app.utils.awsCLI import executeAwsCommands
 from pathlib import Path
 
 
@@ -36,11 +37,20 @@ def test_page():
 @blueprint.route('/executecommands', methods=['GET', 'POST'])
 def execute_commands():
     data = request.get_json()
-    command = data["executeMessage"]
+    commands = data["executeMessage"]
     KEY_FILE = upload_folder + data["filename"]
-    #KEY_FILE =  data["filename"]
+    # KEY_FILE =  data["filename"]
+    result ={}
+
     print(KEY_FILE)
-    result = executeCommands(command, KEY_FILE)
+
+    if "gcloud" in commands:
+        result = executeGcpCommands(commands, KEY_FILE)
+    elif "aws" in commands:
+        result = executeAwsCommands(commands, KEY_FILE)
+
+    # result = executeCommands(command, KEY_FILE)
+
     print(str(result))
     return jsonify(result)
 
