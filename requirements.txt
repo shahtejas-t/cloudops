@@ -3,3 +3,6 @@ python-dotenv
 flask
 flask_cors
 langchain
+subprocess
+json
+shlex

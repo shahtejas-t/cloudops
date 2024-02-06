@@ -21,7 +21,7 @@ def listInstances(vmName, projectId):
 
 
 
-def executeCommands(commands, KEY_FILE):
+def executeGcpCommands(commands, KEY_FILE):
     result = {"status": 200, "response": ""}
      # load a key_file
     data = json.load(open(KEY_FILE))
@@ -57,7 +57,16 @@ def executeCommands(commands, KEY_FILE):
             execute_command = commands + " --format json --project " + projectId
 
             if "instances create" in commands:
-                execute_command = commands + " --format json --zone us-east1-c --project " + projectId
+                vmName = splitCreateCommand(commands)
+                is_vm_exist = listInstances(vmName, projectId)
+                if is_vm_exist != 0:
+                    print("Virtual Machine with Same Name already exist")
+                    result["response"]= "Virtual Machine with Same Name already exist..Please try with another virtual Machine name"
+                    result["status"] = 400
+                    return result
+                else:
+                    execute_command = commands + " --format json --zone us-east1-c --project " + projectId
+
             commands_output_josn = json.loads(
                 subprocess.check_output(shlex.split(execute_command)))
             # print(commands_output_josn)
@@ -83,6 +92,13 @@ def executeCommands(commands, KEY_FILE):
 def splitCommand(command):
     splitdata = command.split()
     checkIndex = splitdata.index('delete')
+    value = splitdata[checkIndex+1]
+    print(value)
+    return value
+
+def splitCreateCommand(command):
+    splitdata = command.split()
+    checkIndex = splitdata.index('create')
     value = splitdata[checkIndex+1]
     print(value)
     return value
