@@ -17,13 +17,30 @@ def listInstances(vmName, projectId):
         # print(instance_output_josn)
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e.returncode}")
-        return{ "status": 500,"error":"Not able to list instances"}
+        return {"status": 500, "error": "Not able to list instances"}
 
 
+def prepare_command(commands, projectId):
+    print(commands)
+# formating output in json format
+    if "--format" not in commands:
+        commands = commands + " --format json"
 
-def executeGcpCommands(commands, KEY_FILE):
+# adding default zone if not present
+    if "--zone" not in commands:
+        commands = commands + " --zone us-east1-c"
+
+# adding project id from service account file if user not provided
+    if "--project" not in commands:
+        commands = commands + " --project" + projectId
+
+    print("Prepared command -- \n", commands)
+    return commands
+
+
+def executeGcpCommands(command, KEY_FILE):
     result = {"status": 200, "response": ""}
-     # load a key_file
+    # load a key_file
     data = json.load(open(KEY_FILE))
     projectId = str(data['project_id'])
     try:
@@ -33,14 +50,16 @@ def executeGcpCommands(commands, KEY_FILE):
             result = {"status": 401, "response": "Unauthorized Access"}
             return result
 
+        # prepare command to exexcute
+        commands = prepare_command(command, projectId)
+
         # execute commands
         if "instances delete" in commands:
             print("Delete Block--------", commands)
             vmName = splitCommand(commands)
             is_vm_exist = listInstances(vmName, projectId)
             if is_vm_exist != 0:
-                execute_command = commands + \
-                    " --format json --zone us-east1-c -q --project " + projectId
+                execute_command = commands + " -q"
                 commands_delete_josn = json.loads(
                     subprocess.check_output(shlex.split(execute_command)))
                 print(commands_delete_josn)
@@ -54,19 +73,20 @@ def executeGcpCommands(commands, KEY_FILE):
 
         else:
             print("Excuting comand: ", commands)
-            execute_command = commands + " --format json --project " + projectId
+            execute_command = commands
 
             if "instances create" in commands:
                 vmName = splitCreateCommand(commands)
                 is_vm_exist = listInstances(vmName, projectId)
                 if is_vm_exist != 0:
                     print("Virtual Machine with Same Name already exist")
-                    result["response"]= "Virtual Machine with Same Name already exist..Please try with another virtual Machine name"
+                    result["response"] = "Virtual Machine with Same Name already exist..Please try with another virtual Machine name"
                     result["status"] = 400
                     return result
                 else:
-                    execute_command = commands + " --format json --zone us-east1-c --project " + projectId
-
+                    pass
+#                   execute_command = commands + " --format json --zone us-east1-c --project " + projectId
+                    
             commands_output_josn = json.loads(
                 subprocess.check_output(shlex.split(execute_command)))
             # print(commands_output_josn)
@@ -96,6 +116,7 @@ def splitCommand(command):
     print(value)
     return value
 
+
 def splitCreateCommand(command):
     splitdata = command.split()
     checkIndex = splitdata.index('create')
@@ -120,8 +141,7 @@ def listallInstances(projectId):
         return vms
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e.returncode}")
-        return{ "status": 500,"error":"Not able to List Insances"}
-
+        return {"status": 500, "error": "Not able to List Insances"}
 
 
 def loginWithServiceAccount(KEY_FILE):
@@ -135,19 +155,20 @@ def loginWithServiceAccount(KEY_FILE):
         return True
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e.output}")
-        return{ "status": 500,"error":"Not able to login"}
-
+        return {"status": 500, "error": "Not able to login"}
 
 
 def logout(projectId):
     try:
         logout_command = "gcloud auth revoke --project "+projectId
-        logout = json.loads(subprocess.check_output(shlex.split(logout_command)))
+        logout = json.loads(subprocess.check_output(
+            shlex.split(logout_command)))
         print("---------------------Logout------------")
         print(logout)
         return "Logout Successfully"
     except Exception as e:
         # print(f"Command failed with return code {e.returncode}")
-        print("Service account tokens cannot be revoked, but they will expire automatically.")
+        print(
+            "Service account tokens cannot be revoked, but they will expire automatically.")
         print("Logged out")
-        return{"status":500,"error":"Not able to logout"}
+        return {"status": 500, "error": "Not able to logout"}

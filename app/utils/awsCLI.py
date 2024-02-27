@@ -27,7 +27,10 @@ def executeAwsCommands(commands, KEY_FILE):
         print("Excuting comand: ", execute_command)
 
         if "run-instances" in commands:
-            execute_command = execute_command + " --instance-type t3.micro --image-id=ami-090793d48e56d862c"
+            # execute_command = execute_command + " --instance-type t3.micro --image-id=ami-090793d48e56d862c"
+            #adding default imageid if user not provided
+            if"--image-id" not in commands:
+                execute_command = execute_command + " --image-id=ami-090793d48e56d862c"
 
 
         commands_output_josn = json.loads(subprocess.check_output(shlex.split(execute_command)))
@@ -46,7 +49,7 @@ def executeAwsCommands(commands, KEY_FILE):
 
     except Exception as e:
         print("Error", e)
-        result['response'] = {"error while executing gcloud command"}
+        result['response'] = {"error while executing aws command"}
         result['status'] = 500
 
     finally:
