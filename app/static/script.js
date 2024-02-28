@@ -14,21 +14,29 @@ let inputFile = "";
 let credFile = "";
 const spinDiv = document.getElementById('spinner');
 
-const createChatLi = (message, className, flag) => {
+const createChatLi = (message, className, flag,id,isButton) => {
     // Create a chat <li> element with passed message and className
     let chatContent = " ";
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
     if (flag == 1) {
+        if(isButton){
         chatLi.classList.add("finalIncoming");
         chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
         edit
         </span>` : `<p></p><button class = "btn btn-primary" style="width:12rem;margin-left:3rem" id="${id}"></button>`;
     }
+    else{
+        chatLi.classList.add("finalIncomingWBtn");
+        chatContent = className === "outgoing" ? `<p id="inpt"></p><span class="material-symbols-outlined edit" id="edit">
+        edit
+        </span>` : `<p></p>`;
+    }
+}
     else {
         // Generate a unique ID based on logic
         const uniqueId = `vmcmd_${new Date().getTime()}`;
-        if (message.length > 5 && message.slice(0, 6) === 'gcloud') {
+        if (message.slice(0, 6) === 'gcloud' || message.slice(0, 3) === 'aws' || message.slice(0, 6) === 'gsutil') {
             chatContent = className === "outgoing"
                 ? `<p data-id="${uniqueId}"></p><span class="material-symbols-outlined edit" data-edit-id="${uniqueId}">
           edit
@@ -53,14 +61,37 @@ const createChatLi = (message, className, flag) => {
     return chatLi; // return chat <li> element
 }
 const executeCommand = (filename, executeMessage) => {
+    listCmd = executeMessage.split(' ');
+    if(listCmd[0] === 'aws'){
+        filename = 'cloudops_user_accessKeys.csv';
+    }
+    if(document.querySelector('.btnDiv')){
+        btnDiv = document.querySelector('.btnDiv');
+        setTimeout(()=>{
+            btnDiv.remove();
+        }, 2000);
+        
+    }
+    
     const requestData = {
         filename: filename,
         executeMessage: executeMessage
     };
     let isListCmd = false;
-    listCmd = executeMessage.split(' ');
+    let isStopCmd = false;
+    let isBucketCmd = false;
+    let isAWSCmd = false;
     if (listCmd.length > 3 && listCmd[3] == 'list') {
         isListCmd = true;
+    }
+    if(listCmd.length > 3 && listCmd[4] == 'stop'){
+        isStopCmd = true;
+    }
+    if (listCmd.length > 3 && listCmd[1] == 'storage'){
+        isBucketCmd = true;
+    }
+    if(listCmd[0] === 'aws'){
+        isAWSCmd = true;
     }
     //disable the multiple send click
     sendChatBtn.style.pointerEvents = 'none';
@@ -85,7 +116,7 @@ const executeCommand = (filename, executeMessage) => {
             }
             else return response.json();
         })
-        .then(data => handleExecuteCommandResponse(data, isListCmd))
+        .then(data => handleExecuteCommandResponse(data, isListCmd,isBucketCmd,isStopCmd,isAWSCmd))
         .catch(error => console.error('Error:', error));
     //make empty the button div
     inputFile = " ";
@@ -105,26 +136,56 @@ function downloadJSON(data, fileName, id) {
 }
 //return downloadLink; // Return the created link
 // You can add a function to handle the response if needed
-const handleExecuteCommandResponse = (data, isListCmd) => {
+const handleExecuteCommandResponse = (data, isListCmd,isBucketCmd, isStopCmd, isAWSCmd) => {
+    sendChatBtn.style.pointerEvents = 'auto';
+    chatbox.removeChild(spinDiv);
     num = num + 1;
     id = 'DwnldBtn_' + num;
+    let isButton = false;
     console.log("Response from executeCommands:", data);
+    if(data.status === 200 && isAWSCmd){
+            const chatLi = document.createElement('li');
+            chatLi.classList.add('chat', 'finalIncoming');
+            const vmListElement = `<h6><center>AWS command executed successfully, for more details download report on below link.</center></h6>
+            <button class = "btn btn-primary" style="margin-top: -1rem;
+            margin-bottom: 1rem;
+            list-style: auto;width: 12rem;
+            margin-left: 12rem;" id="${id}"></button>`
+            chatLi.innerHTML = vmListElement;
+            chatbox.appendChild(chatLi);
+            const downloadLink = downloadJSON(data, 'exam\ple.json', id);
+    }
+    if(data.status === 500){
+        chatbox.appendChild(createChatLi("Facing Error while executing command.", "incoming", 1, id,isButton));
+        chatbox.scrollTo(0, chatbox.scrollHeight);
+    }
     if (data.status === 200 && typeof (data.response) === "string") {
-        chatbox.appendChild(createChatLi(data.response, "incoming", 1, id));
+        chatbox.appendChild(createChatLi(data.response, "incoming", 1, id,isButton));
         let chatLi = document.createElement('li');
         chatLi.classList.add('chat', 'incoming');
         resp = `<p>${data.response}</p>`;
         chatbox.scrollTo(0, chatbox.scrollHeight);
         chatLi.innerHTML = vmListElement;
         chatbox.appendChild(chatLi);
-        sendChatBtn.style.pointerEvents = 'auto';
-        chatbox.removeChild(spinDiv);
+        
+    }
+    else if(data.status === 200 && data.response.length == 0){
+        if(isBucketCmd){
+            chatbox.appendChild(createChatLi("storage bucket is created successfully", "incoming", 1, id,isButton));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
+        else if(isListCmd){
+            chatbox.appendChild(createChatLi("No VM is created.", "incoming", 1, id,isButton));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
+        else {
+            chatbox.appendChild(createChatLi("VM is stopped successfully", "incoming", 1, id,isButton));
+            chatbox.scrollTo(0, chatbox.scrollHeight);
+        }
     }
     else if (data.status === 200 && data.response[0].hasOwnProperty('name')) {
         let respo = data.response[0];
         let vmList = "";
-        sendChatBtn.style.pointerEvents = 'auto';
-        chatbox.removeChild(spinDiv);
         if (data.response.length > 1 || isListCmd) {
             for (i = 0; i < data.response.length; i++) {
                 vmList += `<li style="list-style: auto;
@@ -143,9 +204,10 @@ const handleExecuteCommandResponse = (data, isListCmd) => {
             </ul><button class = "btn btn-primary" style="margin-top: -1rem;
             margin-bottom: 1rem;
             list-style: auto;width: 12rem;
-            margin-left: 15rem;" id="${id}"></button>`
+            margin-left: 12rem;" id="${id}"></button>`
             chatLi.innerHTML = vmListElement;
             chatbox.appendChild(chatLi);
+            const downloadLink = downloadJSON(data, 'exam\ple.json', id);
         }
         else {
             const chatLi = document.createElement('li');
@@ -162,12 +224,12 @@ const handleExecuteCommandResponse = (data, isListCmd) => {
         margin-left: 15rem;" id="${id}"></button>`
             chatLi.innerHTML = respElement;
             chatbox.appendChild(chatLi);
+            const downloadLink = downloadJSON(data, 'exam\ple.json', id);
         }
         vmList = "";
+        
     }
-    else {
-        sendChatBtn.style.pointerEvents = 'auto';
-        chatbox.removeChild(spinDiv);
+    else if(data.status === 200){
         arr = data.response;
         let li = ""
         if (arr.length > 0) {
@@ -187,10 +249,10 @@ const handleExecuteCommandResponse = (data, isListCmd) => {
         chatbox.appendChild(chatLi);
         //chatbox.appendChild(createChatLi("VM is not avialable to delete, for your reference please see the list of availabe VM's", 1,id,arr));
         chatbox.scrollTo(0, chatbox.scrollHeight);
-
+        const downloadLink = downloadJSON(data, 'exam\ple.json', id);
     }
+
     // Download JSON file
-    const downloadLink = downloadJSON(data, 'exam\ple.json', id);
 }
 const handleChat = () => {
     const form = document.getElementById('myForm');

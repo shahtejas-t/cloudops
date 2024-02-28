@@ -2,8 +2,9 @@ from app.main import blueprint
 from flask import render_template, request, redirect, jsonify, url_for
 from config import Config
 from werkzeug.utils import secure_filename
-from app.utils.watsonHelper import WatsonHelper
-from app.utils.scripts import executeCommands
+from app.utils.watsonHelper2 import WatsonHelper
+from app.utils.awsCLI import executeAwsCommands
+from app.utils.gcpCLI import executeGcpCommands
 from pathlib import Path
 
 upload_folder = 'uploads/'
@@ -35,11 +36,20 @@ def test_page():
 @blueprint.route('/executecommands', methods=['GET', 'POST'])
 def execute_commands():
     data = request.get_json()
-    command = data["executeMessage"]
+    commands = data["executeMessage"]
     KEY_FILE = upload_folder + data["filename"]
-    #KEY_FILE =  data["filename"]
+    # KEY_FILE =  data["filename"]
+    result ={}
+
     print(KEY_FILE)
-    result = executeCommands(command, KEY_FILE)
+
+    if "gcloud" in commands:
+        result = executeGcpCommands(commands, KEY_FILE)
+    elif "aws" in commands:
+        result = executeAwsCommands(commands, KEY_FILE)
+
+    # result = executeCommands(command, KEY_FILE)
+
     print(str(result))
     return jsonify(result)
 
@@ -60,13 +70,13 @@ def upload_file():
 def get_prediction():
     if request.method == 'POST' and 'chat_message' in request.form:
         chat_message = request.form['chat_message']  
-        return jsonify(WatsonHelper().get_prediction(chat_message).get('results')[0].get('generated_text'))
+        return jsonify(WatsonHelper().get_prediction(chat_message))
     return jsonify("Internal Server Error.")
 
 @blueprint.route('/checkFileExists', methods = ['GET'])
 def check_File():
-    fileName = Path(upload_folder + "genai-based-application-547a204c911c.json")
+    fileName = Path(upload_folder + "Akash_cloud_config.json")
     print(fileName)
     if fileName.exists() :
-        return {"status":200 , "fileName" : "genai-based-application-547a204c911c.json"}
+        return {"status":200 , "fileName" : "Akash_cloud_config.json"}
     return {"status":201 , "message" : "File not exists"}
