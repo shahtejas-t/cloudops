@@ -12,7 +12,7 @@ def executeAwsCommands(commands, KEY_FILE):
     print("--\n")
 
     try:
-    # login
+        # login
         login, user = loginWithAccessKey(KEY_FILE)
         print("login - ", login)
         print("User - ", user)
@@ -20,32 +20,30 @@ def executeAwsCommands(commands, KEY_FILE):
             result = {"status": 401, "response": "Unauthorized Access"}
             return result
 
-
-
-    #execute Commands
+    # execute Commands
         execute_command = commands + " --output json --profile " + user
         print("Excuting comand: ", execute_command)
 
         if "run-instances" in commands:
             # execute_command = execute_command + " --instance-type t3.micro --image-id=ami-090793d48e56d862c"
-            #adding default imageid if user not provided
-            if"--image-id" not in commands:
-                execute_command = execute_command + " --image-id=ami-090793d48e56d862c"
+            # adding default imageid if user not provided
+            if "--image-id" not in commands:
+                execute_command = execute_command + " --image-id=ami-090793d48e56d862c "
+            if "--instance-type" not in commands:
+                execute_command = execute_command + " --instance-type=t3.micro "
 
-
-        commands_output_josn = json.loads(subprocess.check_output(shlex.split(execute_command)))
+        print("Executing command -- \t", execute_command)
+        commands_output_josn = json.loads(
+            subprocess.check_output(shlex.split(execute_command)))
         print(json.dumps(commands_output_josn, indent=4))
         # return commands_output_josn
         result['response'] = commands_output_josn
-
-
 
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e}")
         result['response'] = e.output
         result['status'] = 500
         # return result:
-    
 
     except Exception as e:
         print("Error", e)
@@ -53,14 +51,10 @@ def executeAwsCommands(commands, KEY_FILE):
         result['status'] = 500
 
     finally:
-    # logout
+        # logout
         logout_aws()
         print("Logout")
         return result
-
-
-
-
 
 
 # login with aws config file ..set profile and default region
@@ -81,19 +75,21 @@ def loginWithAccessKey(KEY_FILE):
             aws_login = subprocess.check_output(shlex.split(aws_login_command))
             print(aws_login)
 
-            default_region_command = "aws configure set region eu-north-1 --profile {}".format(USER)
-            set_default_region = subprocess.check_output(shlex.split(default_region_command))
+            default_region_command = "aws configure set region eu-north-1 --profile {}".format(
+                USER)
+            set_default_region = subprocess.check_output(
+                shlex.split(default_region_command))
 
-            get_default_region = "aws configure get region  --profile {}".format(USER)
-            aws_default_region = subprocess.check_output(shlex.split(get_default_region))
+            get_default_region = "aws configure get region  --profile {}".format(
+                USER)
+            aws_default_region = subprocess.check_output(
+                shlex.split(get_default_region))
             print(aws_default_region)
-
 
         return True, USER
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e.output}")
         return {"status": 500, "error": "Not able to login"}
-
 
 
 # logout
@@ -116,13 +112,9 @@ def logout_aws():
         print(e.returncode)
         print(e.output)
 
-
-
-    
-
     # list all running and terminated instances
 # executeAwsCommands("aws ec2 describe-instances", KEY_FILE)
-    
+
     # Only list running instances
 # executeAwsCommands('aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --output text', KEY_FILE)
 
@@ -131,9 +123,5 @@ def logout_aws():
 # executeAwsCommands("aws ec2 run-instances", KEY_FILE)
 
 
-
-
 # executeAwsCommands("aws ec2 terminate-instances --instance-ids i-0876b6cb2e5977620", KEY_FILE)
 # executeAwsCommands("aws ec2 terminate-instances --instance-ids i-0a1c4235ec47f2369", KEY_FILE)
-
-
