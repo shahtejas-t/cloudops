@@ -20,19 +20,19 @@ def listInstances(vmName, projectId):
         return {"status": 500, "error": "Not able to list instances"}
 
 
-def prepare_command(commands, projectId):
+def prepare_command(commands):
     print(commands)
 # formating output in json format
     if "--format" not in commands:
-        commands = commands + " --format json"
+        commands = commands + " --format json "
 
 # adding default zone if not present
     if "--zone" not in commands:
-        commands = commands + " --zone us-east1-c"
+        commands = commands + " --zone us-east1-c "
 
 # adding project id from service account file if user not provided
-    if "--project" not in commands:
-        commands = commands + " --project" + projectId
+    # if "--project" not in commands:
+    #     commands = commands + " --project" + projectId
 
     print("Prepared command -- \n", commands)
     return commands
@@ -51,7 +51,8 @@ def executeGcpCommands(command, KEY_FILE):
             return result
 
         # prepare command to exexcute
-        commands = prepare_command(command, projectId)
+        commands = command +" --format json " + " --project " + projectId
+        # commands = prepare_command(command, projectId)
 
         # execute commands
         if "instances delete" in commands:
@@ -59,11 +60,14 @@ def executeGcpCommands(command, KEY_FILE):
             vmName = splitCommand(commands)
             is_vm_exist = listInstances(vmName, projectId)
             if is_vm_exist != 0:
+                commands = prepare_command(commands)
                 execute_command = commands + " -q"
+                print("Executing command -- \n", commands)
+                
                 commands_delete_josn = json.loads(
                     subprocess.check_output(shlex.split(execute_command)))
                 print(commands_delete_josn)
-                result['response'] = "Virtual Machine Deleted Successfully"
+                result['response'] = f"Virtual Machine {vmName} Deleted Successfully"
                 # return result
             else:
                 print("No Virtual Machine avaialble with {} name".format(vmName))
@@ -71,27 +75,60 @@ def executeGcpCommands(command, KEY_FILE):
                 result['response'] = allInstance
                 # return result
 
-        else:
+        elif "instances create" in commands:
             print("Excuting comand: ", commands)
-            execute_command = commands
+            # execute_command = commands
 
-            if "instances create" in commands:
-                vmName = splitCreateCommand(commands)
-                is_vm_exist = listInstances(vmName, projectId)
-                if is_vm_exist != 0:
-                    print("Virtual Machine with Same Name already exist")
-                    result["response"] = "Virtual Machine with Same Name already exist..Please try with another virtual Machine name"
-                    result["status"] = 400
-                    return result
+            # if "instances create" in commands:
+            vmName = splitCommand(commands)
+            is_vm_exist = listInstances(vmName, projectId)
+            if is_vm_exist != 0:
+                print("Virtual Machine with Same Name already exist")
+                result["response"] = f"Virtual Machine with {vmName} this name already exist..Please try with another virtual Machine name"
+                result["status"] = 400
+                return result
+            else:
+                pass
+                commands = prepare_command(commands)
+                execute_command = commands
+                print("Executing command -- \n", commands)
+
+                commands_output_josn = json.loads(
+                    subprocess.check_output(shlex.split(execute_command)))
+                result['response'] = commands_output_josn
+
+        elif "instances start" in commands or "instances stop" in commands:
+            print("Start or Stop Block--------", commands)
+            vmName = splitCommand(commands)
+            is_vm_exist = listInstances(vmName, projectId)
+            if is_vm_exist != 0:
+                commands = prepare_command(commands)
+                execute_command = commands
+                print("Executing command -- \n", commands)
+
+                commands_start_josn = json.loads(
+                    subprocess.check_output(shlex.split(execute_command)))
+                print(commands_start_josn)
+                if commands_start_josn:
+                    result['response']=commands_start_josn
                 else:
-                    pass
-#                   execute_command = commands + " --format json --zone us-east1-c --project " + projectId
-                    
-            commands_output_josn = json.loads(
+                    result['response'] = f"Virtual Machine {vmName} stop Successfully"
+            else:
+                print("No Virtual Machine avaialble with {} name".format(vmName))
+                allInstance = listallInstances(projectId)
+                result['response'] = allInstance
+
+        else:
+            print("Default block")
+            execute_command = commands
+            print("Executing command -- \n", commands)
+
+            commands_execute_josn = json.loads(
                 subprocess.check_output(shlex.split(execute_command)))
-            # print(commands_output_josn)
-            result['response'] = commands_output_josn
-            # return commands_output_josn
+            # print(json.dumps(list(commands_execute_josn)))
+            print("--",commands_execute_josn)
+            result['response'] = commands_execute_josn
+
     except subprocess.CalledProcessError as e:
         print(f"Command failed with return code {e}")
         result['response'] = e.output
@@ -109,9 +146,25 @@ def executeGcpCommands(command, KEY_FILE):
         return result
 
 
-def splitCommand(command):
+def splitDeleteCommand(command):
     splitdata = command.split()
     checkIndex = splitdata.index('delete')
+    value = splitdata[checkIndex+1]
+    print(value)
+    return value
+
+def splitCommand(command):
+    splitdata = command.split()
+    if "start" in command:
+        checkIndex = splitdata.index('start')
+    elif "stop" in command:
+        checkIndex = splitdata.index('stop')
+    elif "delete" in command:
+        checkIndex = splitdata.index('delete')
+    elif "create" in command:
+        checkIndex = splitdata.index('create')
+
+
     value = splitdata[checkIndex+1]
     print(value)
     return value
